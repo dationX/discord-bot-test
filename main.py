@@ -1,32 +1,57 @@
 import discord
+from discord.ext import commands
 import random
+from random import choice
+import asyncio
 
-# Переменная intents - хранит привилегии бота
 intents = discord.Intents.default()
-# Включаем привелегию на чтение сообщений
 intents.message_content = True
-# Создаем бота в переменной client и передаем все привелегии
-client = discord.Client(intents=intents)
 
-@client.event
+bot = commands.Bot(command_prefix='/', intents=intents)
+
+@bot.event
 async def on_ready():
-    print(f'We have logged in as {client.user}')
+    print(f'We have logged in as {bot.user}')
 
-@client.event
+@bot.command()
+async def hello(ctx):
+    await ctx.reply(f'Привет! Я бот {bot.user}!')
+
+@bot.command()
+async def heh(ctx, count_heh = 5):
+    await ctx.reply("he" * count_heh)
+
+@bot.command()
+async def Bye(ctx):
+    await ctx.reply("\U0001f642")
+
+@bot.command()
+async def rand_value(ctx, min, max):
+    value = random.randint(min, max)
+    await ctx.reply(f"Рандомное число от {min} {max}: **{value}**")
+
+@bot.command()
+async def monetka(ctx):
+    actions = ("Орел", "Решка")
+    await ctx.reply("Ииииии! Выпадает....")
+    await asyncio.sleep(3)
+    await ctx.reply(f"Выпадает {choice(actions)}")
+
+@bot.command()
+async def gen_pass(ctx, len_password=6):
+    chars = "+-/*!&$#?=@abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+    password = ""
+    for _ in range(int(len_password)):
+        password += random.choice(chars)
+    await ctx.reply(f"Ваш пароль длиной {len_password} символов: ||**{password}**||")
+
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
-    if message.content.startswith('$hello'):
-        await message.channel.send("Hi!")
-    elif message.content.startswith('$bye'):
-        await message.channel.send("\U0001f642")
-    elif message.content.startswith('$random'):
-        number = random.randint(0, 10)
-        await message.channel.send(f"Рандомное число от 0 до 10: **{number}**")
-    elif message.context.startswith("$monetka"):
-        actions = ("Орел", "Орешка")
-        await message.channel.send(f"**{random.choice(actions)}**")
-    else:
-        await message.channel.send(message.content)
+    for char in message.content:
+        if char in ("+", "-", "*", "/", "**"):
+            await message.channel.send(f"Результат: **{eval(message.content)}**")
+            return
 
-client.run("YOUR TOKEN DISCORD BOT")
+bot.run("YOUR TOKEN")
