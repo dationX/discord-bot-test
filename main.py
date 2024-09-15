@@ -62,6 +62,20 @@ async def courses(ctx):
     for value in courses_moneys:
         await ctx.send(f"**{value}**: *{courses_moneys[value]}*")
 
+@bot.event
+async def on_message(message):
+    countrys = ("России", "США", "Франции",
+                "Беларуси", "Украине", "Китае")
+
+    if message.author == bot.user:
+        return
+    if message.content.startswith("Какое состояние окружающей среды в"):
+        country = message.content[35:]
+        if country in countrys:
+            with open(f"{country}.txt", "r", encoding="utf-8") as f:
+                quality = f.read()
+                await message.channel.send(f"Состояние окружающей среды в **{country}** оценивается: *{quality}*")
+
 # Калькулятор нарушает работу остальных команд, используйте или только калькулятор или для остальных комманд комментируйте эту часть кода
 
 # @bot.event
